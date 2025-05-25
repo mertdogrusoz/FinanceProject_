@@ -17,4 +17,5 @@ namespace FinanceApp.Domain.Entities
 		public bool IsActive { get; set; }
 
 	}
+
 }

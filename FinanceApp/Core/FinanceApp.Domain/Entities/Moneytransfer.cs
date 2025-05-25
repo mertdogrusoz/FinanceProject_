@@ -21,4 +21,11 @@ namespace FinanceApp.Domain.Entities
 		public virtual Account ReceiverAccount { get; set; }
 
 	}
+	public enum TransferStatus
+	{
+		Beklemede = 0,
+		Tamamlandi = 1,
+		Basarisiz = 2,
+		Iptal = 3
+	}
 }
