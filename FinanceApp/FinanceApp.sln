@@ -13,6 +13,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastru
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceApp.Infrastructure", "Infrastructure\FinanceApp.Infrastructure\FinanceApp.Infrastructure.csproj", "{E044DD3B-241E-499B-8B54-479611AFAA59}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{28D522D0-7464-4102-97F7-D81088E2F6F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceApp.API", "API\FinanceApp.API\FinanceApp.API.csproj", "{332A9163-CB1E-493B-837F-6EB20F52288D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +35,10 @@ Global
 		{E044DD3B-241E-499B-8B54-479611AFAA59}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E044DD3B-241E-499B-8B54-479611AFAA59}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E044DD3B-241E-499B-8B54-479611AFAA59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{332A9163-CB1E-493B-837F-6EB20F52288D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{332A9163-CB1E-493B-837F-6EB20F52288D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{332A9163-CB1E-493B-837F-6EB20F52288D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{332A9163-CB1E-493B-837F-6EB20F52288D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -39,6 +47,7 @@ Global
 		{C5E9B157-CB81-4C11-B4A7-55F497194303} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{5A450D9F-C7E8-4B1A-80A9-92B8FFB9828B} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{E044DD3B-241E-499B-8B54-479611AFAA59} = {6EAC0DD4-922D-426C-92C3-101C65C83593}
+		{332A9163-CB1E-493B-837F-6EB20F52288D} = {28D522D0-7464-4102-97F7-D81088E2F6F0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DF98839B-F3C3-4966-B60E-8F331B210B4A}
