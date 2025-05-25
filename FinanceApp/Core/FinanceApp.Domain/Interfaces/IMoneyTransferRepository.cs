@@ -10,7 +10,7 @@ namespace FinanceApp.Domain.Interfaces
 	public interface IMoneyTransferRepository
 	{
 		Task<Moneytransfer> GetByIdAsync(int id);
-		Task<Moneytransfer> GetByReferansNAsync(string referansNo);
+		Task<Moneytransfer> GetByReferansAsync(string referenceNumber);
 		Task<IEnumerable<Moneytransfer>> GetByAccountIdAsync(int accountId);
 		Task<Moneytransfer> AddAsync(Moneytransfer transfer);
 		Task UpdateAsync(Moneytransfer transfer);

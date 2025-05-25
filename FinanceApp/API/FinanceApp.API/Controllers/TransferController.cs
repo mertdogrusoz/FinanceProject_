@@ -21,7 +21,7 @@ namespace FinanceApp.API.Controllers
 
 
 		[HttpPost]
-		public async Task<ActionResult<TransferResultDto>> TransferYap(MoneyTransferDto dto)
+		public async Task<ActionResult<TransferResultDto>> TransferYap(SendMoneyDto dto)
 		{
 			try
 			{
@@ -46,20 +46,24 @@ namespace FinanceApp.API.Controllers
 			}
 		}
 
-		[HttpGet("history/{hesapNo}")]
+		[HttpGet("history/{accountNumber}")]
 		public async Task<ActionResult<IEnumerable<Moneytransfer>>> GetTransferHistory(
-			string hesapNo,
-			[FromQuery] DateTime? baslangic = null,
-			[FromQuery] DateTime? bitis = null)
+		  string accountNumber, // Route parametresi ile aynı isim
+		  [FromQuery] DateTime? started = null,
+		  [FromQuery] DateTime? finished = null)
 		{
 			try
 			{
-				var transfers = await _service.GetTransferHistoryAsync(hesapNo, baslangic, bitis);
+				var transfers = await _service.GetTransferHistoryAsync(accountNumber, started, finished);
 				return Ok(transfers);
 			}
 			catch (AccountNotFoundException ex)
 			{
 				return NotFound(new { message = ex.Message });
+			}
+			catch (NotImplementedException ex)
+			{
+				return StatusCode(501, new { message = "Bu özellik henüz implement edilmemiş", error = ex.Message });
 			}
 			catch (Exception ex)
 			{
@@ -67,16 +71,19 @@ namespace FinanceApp.API.Controllers
 			}
 		}
 
-		[HttpGet("referans/{referansNo}")]
-		public async Task<ActionResult<Moneytransfer>> GetTransferByReferans(string referansNo)
+		[HttpGet("referans/{referenceNumber}")]
+		public async Task<ActionResult<Moneytransfer>> GetTransferByReferans(string referenceNumber)
 		{
 			try
 			{
-				var transfer = await _service.GetTransferByReferansAsync(referansNo);
+				var transfer = await _service.GetTransferByReferansAsync(referenceNumber);
 				if (transfer == null)
 					return NotFound(new { message = "Transfer bulunamadı" });
-
 				return Ok(transfer);
+			}
+			catch (NotImplementedException ex)
+			{
+				return StatusCode(501, new { message = "Bu özellik henüz implement edilmemiş", error = ex.Message });
 			}
 			catch (Exception ex)
 			{

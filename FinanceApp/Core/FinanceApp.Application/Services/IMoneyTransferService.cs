@@ -10,9 +10,9 @@ namespace FinanceApp.Application.Services
 {
 	public interface IMoneyTransferService
 	{
-		Task<TransferResultDto> TransferYapAsync(MoneyTransferDto dto);
-		Task<IEnumerable<Moneytransfer>> GetTransferHistoryAsync(string accountNumber, DateTime? started = null, DateTime? finished = null);
-		Task<Moneytransfer> GetTransferByReferansAsync(string ReferenceNumber);
+		Task<TransferResultDto> TransferYapAsync(SendMoneyDto dto);
+		Task<IEnumerable<MoneyTransferDto>> GetTransferHistoryAsync(string accountNumber, DateTime? startDate = null, DateTime? endDate = null);
+		Task<Moneytransfer> GetTransferByReferansAsync(string referenceNumber);
 
 	}
 }

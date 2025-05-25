@@ -2,6 +2,7 @@
 using FinanceApp.Domain.Entities;
 using FinanceApp.Domain.Exceptions;
 using FinanceApp.Domain.Interfaces;
+using FinanceApp.Infrastructure.Context;
 using FluentValidation;
 using System;
 using System.Collections.Generic;
@@ -11,33 +12,40 @@ using System.Threading.Tasks;
 
 namespace FinanceApp.Application.Services
 {
+
 	public class MoneyTransferService : IMoneyTransferService
 	{
-
 		private readonly IUnitOfWork _unitOfWork;
-		private readonly IValidator<MoneyTransferDto> _validator;
+		private readonly IValidator<SendMoneyDto> _validator;
+		private readonly AppDbContext _context;
 
-		public MoneyTransferService(IUnitOfWork unitOfWork, IValidator<MoneyTransferDto> validator)
+		public MoneyTransferService(IUnitOfWork unitOfWork, IValidator<SendMoneyDto> validator, AppDbContext context)
 		{
 			_unitOfWork = unitOfWork;
 			_validator = validator;
+			_context = context;
 		}
 
-		public Task<Moneytransfer> GetTransferByReferansAsync(string ReferenceNumber)
+		public async Task<Moneytransfer> GetTransferByReferansAsync(string ReferenceNumber)
 		{
-			throw new NotImplementedException();
+			if (string.IsNullOrEmpty(ReferenceNumber))
+				throw new ArgumentException("Reference number cannot be null or empty", nameof(ReferenceNumber));
+
+			var transfer = await _unitOfWork.MoneyTransferRepository.GetByReferansAsync(ReferenceNumber);
+
+			
+
+			return transfer;
 		}
 
-		public Task<IEnumerable<Moneytransfer>> GetTransferHistoryAsync(string accountNumber, DateTime? started = null, DateTime? finished = null)
-		{
-			throw new NotImplementedException();
-		}
+		
+
 		private string GenerateReferansNo()
 		{
 			return $"TRF{DateTime.Now:yyyyMMddHHmmss}{new Random().Next(1000, 9999)}";
 		}
 
-		public async Task<TransferResultDto> TransferYapAsync(MoneyTransferDto dto)
+		public async Task<TransferResultDto> TransferYapAsync(SendMoneyDto dto)
 		{
 			var validationResult = await _validator.ValidateAsync(dto);
 			if (!validationResult.IsValid)
@@ -47,23 +55,18 @@ namespace FinanceApp.Application.Services
 			{
 				await _unitOfWork.BeginTransactionAsync();
 
-				
 				var senderAccount = await _unitOfWork.AccountRepository.GetByAccountNumberAsync(dto.SenderAccountId);
 				if (senderAccount == null)
 					throw new AccountNotFoundException(dto.SenderAccountId);
 
-			
 				var receiverAccount = await _unitOfWork.AccountRepository.GetByAccountNumberAsync(dto.ReceiverAccountId);
 				if (receiverAccount == null)
 					throw new AccountNotFoundException(dto.ReceiverAccountId);
 
-				
 				if (senderAccount.BalanceAmount < dto.Amount)
-					throw new InsufficientBalanceException(dto.SenderAccountId, receiverAccount.BalanceAmount, dto.Amount);
+					throw new InsufficientBalanceException(dto.SenderAccountId, senderAccount.BalanceAmount, dto.Amount);
 
-			
 				var referansNo = GenerateReferansNo();
-
 				var transfer = new Moneytransfer
 				{
 					SenderAccountId = senderAccount.Id,
@@ -73,19 +76,14 @@ namespace FinanceApp.Application.Services
 					Status = TransferStatus.Tamamlandi,
 					TransferDate = DateTime.Now,
 					ReferenceNumber = referansNo
-
-
-
 				};
 
-				
 				senderAccount.BalanceAmount -= dto.Amount;
 				receiverAccount.BalanceAmount += dto.Amount;
 
 				await _unitOfWork.MoneyTransferRepository.AddAsync(transfer);
 				await _unitOfWork.AccountRepository.UpdateAsync(senderAccount);
 				await _unitOfWork.AccountRepository.UpdateAsync(receiverAccount);
-
 				await _unitOfWork.SaveChangesAsync();
 				await _unitOfWork.CommitTransactionAsync();
 
@@ -103,5 +101,57 @@ namespace FinanceApp.Application.Services
 				throw;
 			}
 		}
+
+	
+		public async Task<IEnumerable<MoneyTransferDto>> GetTransferHistoryAsync(string accountNumber, DateTime? startDate = null, DateTime? endDate = null)
+		{
+			if (string.IsNullOrEmpty(accountNumber))
+				throw new ArgumentException("Account number cannot be null or empty", nameof(accountNumber));
+
+			// Hesabın var olup olmadığını kontrol et
+			var account = await _unitOfWork.AccountRepository.GetByAccountNumberAsync(accountNumber);
+			if (account == null)
+				throw new AccountNotFoundException(accountNumber);
+
+			// Tarih aralığını kontrol et
+			if (startDate.HasValue && endDate.HasValue && startDate > endDate)
+				throw new ArgumentException("Start date cannot be greater than end date");
+
+			// Eğer tarih belirtilmemişse, son 30 günü getir
+			if (!startDate.HasValue && !endDate.HasValue)
+			{
+				startDate = DateTime.Now.AddDays(-30);
+				endDate = DateTime.Now;
+			}
+			else if (!startDate.HasValue)
+			{
+				startDate = endDate.Value.AddDays(-30);
+			}
+			else if (!endDate.HasValue)
+			{
+				endDate = DateTime.Now;
+			}
+
+			// Repository'den veri çek ve DTO'ya çevir
+			var transfers = await _unitOfWork.MoneyTransferRepository
+				.GetTransferHistoryAsync(account.Id, startDate.Value, endDate.Value);
+
+			var transferDtos = transfers.Select(t => new MoneyTransferDto
+			{
+				Id = t.Id,
+				Amount = t.Amount,
+				TransferDate = t.TransferDate,
+				Description = t.Description,
+				SenderAccountNumber = t.SenderAccount?.AccountNumber,
+				SenderAccountName = t.SenderAccount?.AccountOwner,
+				ReceiverAccountNumber = t.ReceiverAccount?.AccountNumber,
+				ReceiverAccountName = t.ReceiverAccount?.AccountOwner,
+				TransferType = t.SenderAccountId == account.Id ? "Giden" : "Gelen"
+			}).OrderByDescending(t => t.TransferDate);
+
+			return transferDtos;
+		}
+
+		
 	}
 }

@@ -25,35 +25,44 @@ namespace FinanceApp.Infrastructure.Repositories
 			return transfer;
 		}
 
-		public Task<IEnumerable<Moneytransfer>> GetByAccountIdAsync(int accountId)
+		public async Task<IEnumerable<Moneytransfer>> GetByAccountIdAsync(int accountId)
 		{
-			throw new NotImplementedException();
+			return await _context.Moneytransfers
+			  .Include(t => t.SenderAccount)
+			  .Include(t => t.ReceiverAccount)
+			  .Where(t => t.SenderAccountId == accountId || t.ReceiverAccountId == accountId)
+			  .OrderByDescending(t => t.TransferDate)
+			  .ToListAsync();
+
 		}
 
-		public Task<Moneytransfer> GetByIdAsync(int id)
+		public async Task<Moneytransfer> GetByIdAsync(int id)
 		{
-			throw new NotImplementedException();
+			return await _context.Moneytransfers
+			  .Include(t => t.SenderAccount)
+			  .Include(t => t.ReceiverAccount)
+			  .FirstOrDefaultAsync(t => t.Id == id);
+
 		}
 
-		public Task<Moneytransfer> GetByReferansNAsync(string referansNo)
+		public async Task<Moneytransfer> GetByReferansAsync(string referenceNumber)
 		{
-			throw new NotImplementedException();
+			return await _context.Moneytransfers
+			   .Include(t => t.SenderAccount)
+			   .Include(t => t.ReceiverAccount)
+			   .FirstOrDefaultAsync(t => t.ReferenceNumber == referenceNumber);
+
 		}
 
 		public async Task<IEnumerable<Moneytransfer>> GetTransferHistoryAsync(int accountId, DateTime? started = null, DateTime? finished = null)
 		{
 			var query = _context.Moneytransfers
-			   .Include(t => t.SenderAccount)
-			   .Include(t => t.ReceiverAccount)
-				.Where(t => t.SenderAccountId == accountId || t.ReceiverAccountId == accountId);
+		  .Include(t => t.SenderAccount)    
+		  .Include(t => t.ReceiverAccount) 
+		  .Where(t => t.SenderAccountId == accountId || t.ReceiverAccountId == accountId)
+		  .Where(t => t.TransferDate >= started && t.TransferDate <= finished);
 
-			if (started.HasValue)
-				query = query.Where(t => t.TransferDate >= started.Value);
-
-			if (finished.HasValue)
-				query = query.Where(t => t.TransferDate <= finished.Value);
-
-			return await query.OrderByDescending(t => t.TransferDate).ToListAsync();
+			return await query.ToListAsync();
 		}
 
 		public async Task UpdateAsync(Moneytransfer transfer)
