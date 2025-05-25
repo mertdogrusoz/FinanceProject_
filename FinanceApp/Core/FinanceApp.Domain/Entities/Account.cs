@@ -16,6 +16,11 @@ namespace FinanceApp.Domain.Entities
 		public DateTime CreatedDate { get; set; }
 		public bool IsActive { get; set; }
 
+		public virtual ICollection<Moneytransfer> SentTransfers { get; set; }
+		public virtual ICollection<Moneytransfer> ReceivedTransfers { get; set; }
+
+		public virtual ICollection<LoanApplication> LoansApplications { get; set; }
+
 	}
 
 }

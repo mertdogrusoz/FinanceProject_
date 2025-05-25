@@ -12,6 +12,7 @@ namespace FinanceApp.Infrastructure.Context
 	{
 		public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
 		{
+
 		}
 		public DbSet<Account> Accounts { get; set; }
 		public DbSet<Moneytransfer> Moneytransfers { get; set; }
@@ -30,7 +31,7 @@ namespace FinanceApp.Infrastructure.Context
 				entity.HasIndex(e => e.IBAN).IsUnique();
 			});
 
-			// ParaTransferi Entity Configuration
+			
 			modelBuilder.Entity<Moneytransfer>(entity =>
 			{
 				entity.HasKey(e => e.Id);
@@ -38,6 +39,17 @@ namespace FinanceApp.Infrastructure.Context
 				entity.Property(e => e.ReferenceNumber).IsRequired().HasMaxLength(50);
 				entity.Property(e => e.Description).HasMaxLength(500);
 				entity.HasIndex(e => e.ReferenceNumber).IsUnique();
+
+
+				entity.HasOne(e => e.SenderAccount)
+					.WithMany(h => h.SentTransfers)
+					.HasForeignKey(e => e.SenderAccountId)
+					.OnDelete(DeleteBehavior.Restrict);
+
+				entity.HasOne(e => e.ReceiverAccount)
+					.WithMany(h => h.ReceivedTransfers)
+					.HasForeignKey(e => e.ReceiverAccountId)
+					.OnDelete(DeleteBehavior.Restrict);
 
 
 			});
@@ -48,6 +60,13 @@ namespace FinanceApp.Infrastructure.Context
 				entity.HasKey(e => e.Id);
 				entity.Property(e => e.RequestedAmount).HasColumnType("decimal(18,2)");
 				entity.Property(e => e.Description).HasMaxLength(1000);
+
+				entity.HasOne(e => e.Account)
+				   .WithMany(h => h.LoansApplications)
+				   .HasForeignKey(e => e.AccountId)
+				   .OnDelete(DeleteBehavior.Cascade);
+
+
 
 			});
 
