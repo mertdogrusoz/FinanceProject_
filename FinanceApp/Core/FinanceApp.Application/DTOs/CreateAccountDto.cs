@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FinanceApp.Domain.Entities
+namespace FinanceApp.Application.DTOs
 {
 	public class CreateAccountDto
 	{
