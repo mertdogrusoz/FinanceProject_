@@ -1,4 +1,5 @@
 ﻿using FinanceApp.Application.DTOs;
+using FinanceApp.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace FinanceApp.Application.Services
 	{
 		Task<AccountDto> GetHesapByIdAsync(int id);
 		Task<AccountDto> GetHesapByAccountNumberAsync(string AccountNumber);
-		Task<AccountDto> CreateAccountAsync(AccountDto dto);
+		Task<AccountDto> CreateAccountAsync(CreateAccountDto dto);
 		Task<decimal> GetBalanceAsync(string AccountNumber);
 		Task<IEnumerable<AccountDto>> GetAllAccountsAsync();
 
