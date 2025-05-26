@@ -98,7 +98,7 @@ namespace FinanceApp.Application.Services
 				};
 			}
 
-			// Token üretimi
+			// Generate Token
 			var token = await GenerateJwtTokenAsync(user);
 			var userDto = await MapToUserDto(user);
 
@@ -136,7 +136,7 @@ namespace FinanceApp.Application.Services
 
 				if (result.Succeeded)
 				{
-					// 2. Otomatik hesap oluştur
+				
 					var account = new Account
 					{
 						UserId = user.Id,

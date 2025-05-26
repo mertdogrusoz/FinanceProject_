@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace FinanceApp.Infrastructure.Context
 {
-	// IdentityDbContext<AppUser> olarak değiştirin
+
 	public class AppDbContext : IdentityDbContext<AppUser>
 	{
 		public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)

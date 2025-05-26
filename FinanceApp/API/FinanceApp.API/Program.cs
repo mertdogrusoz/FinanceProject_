@@ -25,7 +25,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
 	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Basit Authentication - Rol sistemi olmadan
 builder.Services.AddIdentityCore<AppUser>(options =>
 {
 
@@ -159,13 +158,13 @@ app.UseCors("AllowReact");
 app.UseHttpsRedirection();
 app.UseRouting();
 
-// Authentication önce, Authorization sonra olmalý
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
-// Database migration ve seeding - Rol sistemi kaldýrýldý
+
 using (var scope = app.Services.CreateScope())
 {
 	var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -173,10 +172,10 @@ using (var scope = app.Services.CreateScope())
 
 	try
 	{
-		// Migrate database
+	
 		context.Database.Migrate();
 
-		// Seed admin user if needed (rol sistemi olmadan)
+	
 		await SeedDataAsync(userManager);
 	}
 	catch (Exception ex)
@@ -188,7 +187,6 @@ using (var scope = app.Services.CreateScope())
 
 static async Task SeedDataAsync(UserManager<AppUser> userManager)
 {
-	// Seed Admin User (rol sistemi olmadan)
 	var adminEmail = "admin@financeapp.com";
 	var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
@@ -208,7 +206,6 @@ static async Task SeedDataAsync(UserManager<AppUser> userManager)
 		var result = await userManager.CreateAsync(adminUser, "Admin123!");
 		if (!result.Succeeded)
 		{
-			// Log errors if needed
 			foreach (var error in result.Errors)
 			{
 				Console.WriteLine($"Error creating admin user: {error.Description}");
