@@ -48,7 +48,7 @@ namespace FinanceApp.API.Controllers
 
 		[HttpGet("history/{accountNumber}")]
 		public async Task<ActionResult<IEnumerable<Moneytransfer>>> GetTransferHistory(
-		  string accountNumber, // Route parametresi ile aynı isim
+		  string accountNumber,
 		  [FromQuery] DateTime? started = null,
 		  [FromQuery] DateTime? finished = null)
 		{

@@ -144,7 +144,7 @@ namespace FinanceApp.Application.Services
 					Errors = new[] { "Invalid credentials" }
 				};
 			}
-
+				
 			// Şifre kontrolü doğrudan UserManager ile yapılır
 			var isPasswordValid = await _userManager.CheckPasswordAsync(user, loginDto.Password);
 			if (!isPasswordValid)
