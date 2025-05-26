@@ -24,14 +24,12 @@ namespace FinanceApp.Infrastructure.Context
 		{
 			base.OnModelCreating(modelBuilder);
 
-		
 			modelBuilder.Entity<AppUser>(entity =>
 			{
 				entity.Property(e => e.FirstName).IsRequired().HasMaxLength(50);
 				entity.Property(e => e.LastName).IsRequired().HasMaxLength(50);
 				entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
 			});
-
 			
 			modelBuilder.Entity<Account>(entity =>
 			{
@@ -48,7 +46,6 @@ namespace FinanceApp.Infrastructure.Context
 				   .OnDelete(DeleteBehavior.Cascade);
 			});
 
-			
 			modelBuilder.Entity<Moneytransfer>(entity =>
 			{
 				entity.HasKey(e => e.Id);
@@ -65,7 +62,6 @@ namespace FinanceApp.Infrastructure.Context
 					.HasForeignKey(e => e.ReceiverAccountId)
 					.OnDelete(DeleteBehavior.Restrict);
 			});
-
 		
 			modelBuilder.Entity<LoanApplication>(entity =>
 			{

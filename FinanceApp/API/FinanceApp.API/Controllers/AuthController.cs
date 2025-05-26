@@ -110,11 +110,5 @@ namespace FinanceApp.API.Controllers
 				return StatusCode(500, new { message = "İç sunucu hatası", error = ex.Message });
 			}
 		}
-
-
-
-
-
-
 	}
 }

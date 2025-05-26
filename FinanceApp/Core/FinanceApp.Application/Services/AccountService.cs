@@ -94,7 +94,6 @@ namespace FinanceApp.Application.Services
 		{
 			return DateTime.Now.Ticks.ToString().Substring(8);
 		}
-
 		private string GenerateIBAN()
 		{
 			var random = new Random();

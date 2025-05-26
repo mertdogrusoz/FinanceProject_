@@ -19,8 +19,6 @@ namespace FinanceApp.API.Controllers
 			_service = service;
 		}
 
-
-
 		[HttpPost]
 		public async Task<ActionResult<TransferResultDto>> Transfer(SendMoneyDto dto)
 		{

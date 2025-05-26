@@ -198,16 +198,9 @@ namespace FinanceApp.Application.Services
 		{
 			var random = new Random();
 			var iban = "TR";
-
-		
 			iban += random.Next(10, 99).ToString();
-
-		
 			iban += "00001";
-
-		
 			iban += "0";
-
 		
 			for (int i = 0; i < 16; i++)
 			{
@@ -243,8 +236,6 @@ namespace FinanceApp.Application.Services
 				new Claim("LastName", user.LastName)
 			};
 
-		
-
 			var tokenDescriptor = new SecurityTokenDescriptor
 			{
 				Subject = new ClaimsIdentity(claims),
@@ -272,7 +263,6 @@ namespace FinanceApp.Application.Services
 			
 			};
 
-			
 			var account = await _context.Accounts
 				.Where(a => a.UserId == user.Id && a.IsActive)
 				.FirstOrDefaultAsync();
@@ -280,9 +270,7 @@ namespace FinanceApp.Application.Services
 			dto.AccountNumber = account?.AccountNumber;
 			return dto;
 
-
 		}
 	}
-
 
 }
