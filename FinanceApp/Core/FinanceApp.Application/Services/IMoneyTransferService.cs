@@ -14,5 +14,6 @@ namespace FinanceApp.Application.Services
 		Task<IEnumerable<MoneyTransferDto>> GetTransferHistoryAsync(string accountNumber, DateTime? startDate = null, DateTime? endDate = null);
 		Task<Moneytransfer> GetTransferByReferansAsync(string referenceNumber);
 
+
 	}
 }

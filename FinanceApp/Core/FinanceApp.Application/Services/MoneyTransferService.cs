@@ -33,12 +33,12 @@ namespace FinanceApp.Application.Services
 
 			var transfer = await _unitOfWork.MoneyTransferRepository.GetByReferansAsync(ReferenceNumber);
 
-			
+
 
 			return transfer;
 		}
 
-		
+
 
 		private string GenerateReferansNo()
 		{
@@ -102,22 +102,22 @@ namespace FinanceApp.Application.Services
 			}
 		}
 
-	
+
 		public async Task<IEnumerable<MoneyTransferDto>> GetTransferHistoryAsync(string accountNumber, DateTime? startDate = null, DateTime? endDate = null)
 		{
 			if (string.IsNullOrEmpty(accountNumber))
 				throw new ArgumentException("Account number cannot be null or empty", nameof(accountNumber));
 
-			
+
 			var account = await _unitOfWork.AccountRepository.GetByAccountNumberAsync(accountNumber);
 			if (account == null)
 				throw new AccountNotFoundException(accountNumber);
 
-		
+
 			if (startDate.HasValue && endDate.HasValue && startDate > endDate)
 				throw new ArgumentException("Start date cannot be greater than end date");
 
-			
+
 			if (!startDate.HasValue && !endDate.HasValue)
 			{
 				startDate = DateTime.Now.AddDays(-30);
@@ -132,7 +132,7 @@ namespace FinanceApp.Application.Services
 				endDate = DateTime.Now;
 			}
 
-		
+
 			var transfers = await _unitOfWork.MoneyTransferRepository
 				.GetTransferHistoryAsync(account.Id, startDate.Value, endDate.Value);
 
@@ -152,6 +152,6 @@ namespace FinanceApp.Application.Services
 			return transferDtos;
 		}
 
-		
+
 	}
 }

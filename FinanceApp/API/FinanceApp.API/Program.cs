@@ -28,7 +28,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Basit Authentication - Rol sistemi olmadan
 builder.Services.AddIdentityCore<AppUser>(options =>
 {
-	// Password settings
+
 	options.Password.RequireDigit = true;
 	options.Password.RequireLowercase = true;
 	options.Password.RequireNonAlphanumeric = false;
@@ -36,17 +36,15 @@ builder.Services.AddIdentityCore<AppUser>(options =>
 	options.Password.RequiredLength = 6;
 	options.Password.RequiredUniqueChars = 1;
 
-	// Lockout settings
+
 	options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
 	options.Lockout.MaxFailedAccessAttempts = 5;
 	options.Lockout.AllowedForNewUsers = true;
 
-	// User settings
 	options.User.AllowedUserNameCharacters =
 		"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
 	options.User.RequireUniqueEmail = true;
 
-	// Sign in settings
 	options.SignIn.RequireConfirmedEmail = false;
 	options.SignIn.RequireConfirmedPhoneNumber = false;
 })
@@ -111,6 +109,12 @@ builder.Services.AddCors(options =>
 				  .AllowAnyMethod();
 		});
 });
+builder.Services.AddControllers()
+    .AddJsonOptions(opts =>
+    {
+        opts.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+        opts.JsonSerializerOptions.MaxDepth = 64;
+    });
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
