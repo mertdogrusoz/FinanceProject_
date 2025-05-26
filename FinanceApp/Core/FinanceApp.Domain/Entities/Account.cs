@@ -15,12 +15,14 @@ namespace FinanceApp.Domain.Entities
 		public string AccountOwner { get; set; }
 		public DateTime CreatedDate { get; set; }
 		public bool IsActive { get; set; }
+		public string UserId { get; set; }
+		public virtual AppUser User { get; set; }
 
 		public virtual ICollection<Moneytransfer> SentTransfers { get; set; }
 		public virtual ICollection<Moneytransfer> ReceivedTransfers { get; set; }
 
 		public virtual ICollection<LoanApplication> LoansApplications { get; set; }
 
-	}
+	}	
 
 }
