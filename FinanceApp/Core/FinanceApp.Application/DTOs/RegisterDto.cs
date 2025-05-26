@@ -13,6 +13,6 @@ namespace FinanceApp.Application.DTOs
 		public string ConfirmPassword { get; set; }
 		public string FirstName { get; set; }
 		public string LastName { get; set; }
-		public string PhoneNumber { get; set; }
+	
 	}
 }

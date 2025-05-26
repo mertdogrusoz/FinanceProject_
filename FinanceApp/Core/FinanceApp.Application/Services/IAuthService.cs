@@ -17,5 +17,6 @@ namespace FinanceApp.Application.Services
 		Task<UserDto> GetUserByIdAsync(string userId);
 		Task<UserDto> GetUserByEmailAsync(string email);
 		Task<bool> LogoutAsync(string userId);
+		Task<Decimal?> GetBalanceAsync(string userId);
 	}
 }

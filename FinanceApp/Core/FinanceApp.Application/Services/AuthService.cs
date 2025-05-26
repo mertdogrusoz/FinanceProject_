@@ -1,7 +1,9 @@
 ﻿using FinanceApp.Application.DTOs;
 using FinanceApp.Domain.Entities;
+using FinanceApp.Infrastructure.Context;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -22,8 +24,10 @@ namespace FinanceApp.Application.Services
 		private readonly IValidator<RegisterDto> _registerValidator;
 		private readonly IValidator<LoginDto> _loginValidator;
 		private readonly IValidator<ChangePasswordDto> _changePasswordValidator;
+		private readonly AppDbContext _context;
 
-		public AuthService(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, IConfiguration configuration, IValidator<RegisterDto> registerValidator, IValidator<LoginDto> loginValidator, IValidator<ChangePasswordDto> changePasswordValidator)
+
+		public AuthService(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, IConfiguration configuration, IValidator<RegisterDto> registerValidator, IValidator<LoginDto> loginValidator, IValidator<ChangePasswordDto> changePasswordValidator, AppDbContext context)
 		{
 			_userManager = userManager;
 			_signInManager = signInManager;
@@ -31,6 +35,7 @@ namespace FinanceApp.Application.Services
 			_registerValidator = registerValidator;
 			_loginValidator = loginValidator;
 			_changePasswordValidator = changePasswordValidator;
+			_context = context;
 		}
 
 		public async Task<AuthResultDto> ChangePasswordAsync(string userId, ChangePasswordDto changePasswordDto)
@@ -95,12 +100,25 @@ namespace FinanceApp.Application.Services
 		public async Task<UserDto> GetUserByEmailAsync(string email)
 		{
 			var user = await _userManager.FindByEmailAsync(email);
-			return user != null ? MapToUserDto(user) : null;
+			if (user == null)
+				return null;
+
+			return await MapToUserDto(user);
 		}
 
 		public async Task<UserDto> GetUserByIdAsync(string userId)
 		{
-			throw new NotImplementedException();
+			if (string.IsNullOrEmpty(userId))
+				if (string.IsNullOrEmpty(userId))
+					return null;
+
+			var user = await _userManager.FindByIdAsync(userId);
+			if (user == null || !user.IsActive)
+				return null;
+
+			// Burada MapToUserDto bir Task<UserDto> döndürüyor,
+			// async metodunuzun da gerçek UserDto dönmesi için await edin:
+			return await MapToUserDto(user);
 		}
 
 		public async Task<AuthResultDto> LoginAsync(LoginDto loginDto)
@@ -141,13 +159,14 @@ namespace FinanceApp.Application.Services
 
 			// Token üretimi
 			var token = await GenerateJwtTokenAsync(user);
+			var userDto = await MapToUserDto(user);
 
 			return new AuthResultDto
 			{
 				Success = true,
 				Message = "Giriş başarılı",
 				Token = token,
-				User = MapToUserDto(user)
+				User = userDto
 			};
 		}
 
@@ -160,61 +179,115 @@ namespace FinanceApp.Application.Services
 
 		public async Task<AuthResultDto> RegisterAsync(RegisterDto registerDto)
 		{
-			var validationResult = await _registerValidator.ValidateAsync(registerDto);
-			if (!validationResult.IsValid)
+			try
 			{
+				// 1. Kullanıcıyı oluştur
+				var user = new AppUser
+				{
+					UserName = registerDto.Email,
+					Email = registerDto.Email,
+					FirstName = registerDto.FirstName,
+					LastName = registerDto.LastName,
+					// diğer özellikler...
+				};
+
+				var result = await _userManager.CreateAsync(user, registerDto.Password);
+
+				if (result.Succeeded)
+				{
+					// 2. Otomatik hesap oluştur
+					var account = new Account
+					{
+						UserId = user.Id,
+						AccountNumber = GenerateAccountNumber(), // Hesap numarası üret
+						IBAN = GenerateIBAN(), // IBAN üret
+						BalanceAmount = 0, // Başlangıç bakiyesi
+						AccountOwner = $"{user.FirstName} {user.LastName}",
+						CreatedDate = DateTime.Now,
+						IsActive = true
+					};
+
+					_context.Accounts.Add(account);
+					await _context.SaveChangesAsync();
+
+					// Başarılı sonuç döndür
+					return new AuthResultDto
+					{
+						Success = true,
+						Message = "Kullanıcı başarıyla oluşturuldu ve hesap açıldı.",
+						UserId = user.Id
+					};
+				}
+				else
+				{
+					// Kullanıcı oluşturulamadı
+					var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+					return new AuthResultDto
+					{
+						Success = false,
+						Message = $"Kullanıcı oluşturulamadı: {errors}"
+					};
+				}
+			}
+			catch (Exception ex)
+			{
+				// Hata yönetimi
 				return new AuthResultDto
 				{
 					Success = false,
-					Message = "Validasyon hatası",
-					Errors = validationResult.Errors.Select(e => e.ErrorMessage)
+					Message = $"Bir hata oluştu: {ex.Message}"
 				};
 			}
-
-			var existingUser = await _userManager.FindByEmailAsync(registerDto.Email);
-			if (existingUser != null)
-			{
-				return new AuthResultDto
-				{
-					Success = false,
-					Message = "Bu email adresi zaten kullanılıyor",
-					Errors = new[] { "Email already exists" }
-				};
-			}
-
-			var user = new AppUser
-			{
-
-				UserName = registerDto.Email,
-				Email = registerDto.Email,
-				FirstName = registerDto.FirstName,
-				LastName = registerDto.LastName,
-				PhoneNumber = registerDto.PhoneNumber,
-				CreatedAt = DateTime.UtcNow,
-				IsActive = true
-			};
-
-			var result = await _userManager.CreateAsync(user, registerDto.Password);
-
-			if (result.Succeeded)
-			{
-				var token = await GenerateJwtTokenAsync(user);
-				return new AuthResultDto
-				{
-					Success = true,
-					Message = "Kayıt başarıyla tamamlandı",
-					Token = token,
-					User = MapToUserDto(user)
-				};
-			}
-
-			return new AuthResultDto
-			{
-				Success = false,
-				Message = "Kayıt işlemi başarısız",
-				Errors = result.Errors.Select(e => e.Description)
-			};
 		}
+		private string GenerateAccountNumber()
+		{
+			var random = new Random();
+			var accountNumber = "";
+
+			for (int i = 0; i < 10; i++)
+			{
+				accountNumber += random.Next(0, 9).ToString();
+			}
+
+			return accountNumber;
+		}
+
+		// IBAN üretme fonksiyonu (basit örnek)
+		private string GenerateIBAN()
+		{
+			var random = new Random();
+			var iban = "TR";
+
+			// 2 haneli kontrol kodu
+			iban += random.Next(10, 99).ToString();
+
+			// 5 haneli banka kodu (örnek: 00001)
+			iban += "00001";
+
+			// 1 haneli sıfır
+			iban += "0";
+
+			// 16 haneli hesap numarası
+			for (int i = 0; i < 16; i++)
+			{
+				iban += random.Next(0, 9).ToString();
+			}
+
+			return iban;
+		}
+		public async Task<decimal?> GetBalanceAsync(string userId)
+		{
+			if (string.IsNullOrEmpty(userId))
+				return null;
+
+			var account = await _context.Accounts.FirstOrDefaultAsync(a => a.UserId == userId && a.IsActive);
+
+			if (account == null)
+				return null;
+
+			return account.BalanceAmount;
+		}
+
 
 		public Task<AuthResultDto> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
 		{
@@ -249,19 +322,29 @@ namespace FinanceApp.Application.Services
 			var token = tokenHandler.CreateToken(tokenDescriptor);
 			return tokenHandler.WriteToken(token);
 		}
-		private UserDto MapToUserDto(AppUser user)
+		private async Task<UserDto> MapToUserDto(AppUser user)
 		{
-			return new UserDto
+			var dto = new UserDto
 			{
 				Id = user.Id,
 				Email = user.Email,
 				FirstName = user.FirstName,
 				LastName = user.LastName,
 				FullName = user.FullName,
-				PhoneNumber = user.PhoneNumber,
 				CreatedAt = user.CreatedAt,
 				IsActive = user.IsActive
+				// henüz AccountNumber yok
 			};
+
+			
+			var account = await _context.Accounts
+				.Where(a => a.UserId == user.Id && a.IsActive)
+				.FirstOrDefaultAsync();
+
+			dto.AccountNumber = account?.AccountNumber;
+			return dto;
+
+
 		}
 	}
 

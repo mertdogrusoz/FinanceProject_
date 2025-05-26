@@ -16,5 +16,6 @@ namespace FinanceApp.Application.DTOs
 		public string PhoneNumber { get; set; }
 		public DateTime CreatedAt { get; set; }
 		public bool IsActive { get; set; }
+		public string AccountNumber { get; set; }
 	}
 }

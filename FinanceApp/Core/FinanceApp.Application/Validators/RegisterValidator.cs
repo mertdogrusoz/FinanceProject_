@@ -33,10 +33,7 @@ namespace FinanceApp.Application.Validators
 				.NotEmpty().WithMessage("Soyad zorunludur")
 				.Length(2, 50).WithMessage("Soyad 2-50 karakter arası olmalıdır");
 
-			RuleFor(x => x.PhoneNumber)
-				.Matches(@"^(\+90|0)?[5][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]$")
-				.When(x => !string.IsNullOrEmpty(x.PhoneNumber))
-				.WithMessage("Geçerli bir telefon numarası giriniz");
+		
 		}
 
 	}

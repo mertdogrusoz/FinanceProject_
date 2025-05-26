@@ -4,6 +4,7 @@ using FinanceApp.Domain.Entities;
 using FinanceApp.Domain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
 using System.ComponentModel.DataAnnotations;
@@ -132,22 +133,12 @@ namespace FinanceApp.API.Controllers
 		[Authorize]
 		public async Task<ActionResult<UserDto>> GetProfile()
 		{
-			try
-			{
-				var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-				var user = await _authService.GetUserByIdAsync(userId);
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			var userDto = await _authService.GetUserByIdAsync(userId);
+			if (userDto == null)
+				return NotFound();
 
-				if (user == null)
-				{
-					return NotFound(new { message = "Kullanıcı bulunamadı" });
-				}
-
-				return Ok(user);
-			}
-			catch (Exception ex)
-			{
-				return StatusCode(500, new { message = "İç sunucu hatası", error = ex.Message });
-			}
+			return Ok(userDto);
 		}
 
 
@@ -220,23 +211,32 @@ namespace FinanceApp.API.Controllers
 		//	}
 		//}
 
-		//[HttpGet("{hesapNo}/bakiye")]
-		//public async Task<ActionResult<decimal>> GetBakiye(string hesapNo)
-		//{
-		//	try
-		//	{
-		//		var bakiye = await _accountService.GetBalanceAsync(hesapNo);
-		//		return Ok(new { hesapNo, bakiye });
-		//	}
-		//	catch (AccountNotFoundException ex)
-		//	{
-		//		return NotFound(new { message = ex.Message });
-		//	}
-		//	catch (Exception ex)
-		//	{
-		//		return StatusCode(500, new { message = "İç sunucu hatası", error = ex.Message });
-		//	}
-		//}
+		[HttpGet("balance")]
+		[Authorize]
+		public async Task<IActionResult> GetBalance()
+		{
+			try
+			{
+				var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+				var balance = await _authService.GetBalanceAsync(userId);
+
+				if (balance == null)
+				{
+					return NotFound(new { message = "Hesap bulunamadı" });
+				}
+
+				return Ok(new { balance });
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, new { message = "İç sunucu hatası", error = ex.Message });
+			}
+		}
+
+
+
+
+
 
 	}
 }
