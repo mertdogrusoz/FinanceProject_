@@ -11,9 +11,7 @@ namespace FinanceApp.Application.Services
 	{
 		Task<AuthResultDto> RegisterAsync(RegisterDto registerDto);
 		Task<AuthResultDto> LoginAsync(LoginDto loginDto);
-		Task<AuthResultDto> ChangePasswordAsync(string userId, ChangePasswordDto changePasswordDto);
-		Task<bool> ForgotPasswordAsync(ForgotPasswordDto forgotPasswordDto);
-		Task<AuthResultDto> ResetPasswordAsync(ResetPasswordDto resetPasswordDto);
+		
 		Task<UserDto> GetUserByIdAsync(string userId);
 		Task<UserDto> GetUserByEmailAsync(string email);
 		Task<bool> LogoutAsync(string userId);

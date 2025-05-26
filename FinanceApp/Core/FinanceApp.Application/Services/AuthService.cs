@@ -34,68 +34,11 @@ namespace FinanceApp.Application.Services
 			_configuration = configuration;
 			_registerValidator = registerValidator;
 			_loginValidator = loginValidator;
-			_changePasswordValidator = changePasswordValidator;
+			
 			_context = context;
 		}
 
-		public async Task<AuthResultDto> ChangePasswordAsync(string userId, ChangePasswordDto changePasswordDto)
-		{
-			var validationResult = await _changePasswordValidator.ValidateAsync(changePasswordDto);
-			if (!validationResult.IsValid)
-			{
-				return new AuthResultDto
-				{
-					Success = false,
-					Message = "Validasyon hatası",
-					Errors = validationResult.Errors.Select(e => e.ErrorMessage)
-				};
-			}
-
-			var user = await _userManager.FindByIdAsync(userId);
-			if (user == null)
-			{
-				return new AuthResultDto
-				{
-					Success = false,
-					Message = "Kullanıcı bulunamadı",
-					Errors = new[] { "User not found" }
-				};
-			}
-
-			var result = await _userManager.ChangePasswordAsync(user, changePasswordDto.CurrentPassword, changePasswordDto.NewPassword);
-
-			if (result.Succeeded)
-			{
-				return new AuthResultDto
-				{
-					Success = true,
-					Message = "Şifre başarıyla değiştirildi"
-				};
-			}
-
-			return new AuthResultDto
-			{
-				Success = false,
-				Message = "Şifre değiştirme işlemi başarısız",
-				Errors = result.Errors.Select(e => e.Description)
-			};
-		}
-
-		public async Task<bool> ForgotPasswordAsync(ForgotPasswordDto forgotPasswordDto)
-		{
-			var user = await _userManager.FindByEmailAsync(forgotPasswordDto.Email);
-			if (user == null || !user.IsActive)
-			{
-				// Security: Don't reveal if user exists
-				return true;
-			}
-
-			var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-			// TODO: Send email with reset token
-			// await _emailService.SendPasswordResetEmailAsync(user.Email, token);
-
-			return true;
-		}
+	
 
 		public async Task<UserDto> GetUserByEmailAsync(string email)
 		{
@@ -116,8 +59,6 @@ namespace FinanceApp.Application.Services
 			if (user == null || !user.IsActive)
 				return null;
 
-			// Burada MapToUserDto bir Task<UserDto> döndürüyor,
-			// async metodunuzun da gerçek UserDto dönmesi için await edin:
 			return await MapToUserDto(user);
 		}
 
@@ -145,7 +86,7 @@ namespace FinanceApp.Application.Services
 				};
 			}
 				
-			// Şifre kontrolü doğrudan UserManager ile yapılır
+		
 			var isPasswordValid = await _userManager.CheckPasswordAsync(user, loginDto.Password);
 			if (!isPasswordValid)
 			{
@@ -181,14 +122,14 @@ namespace FinanceApp.Application.Services
 		{
 			try
 			{
-				// 1. Kullanıcıyı oluştur
+			
 				var user = new AppUser
 				{
 					UserName = registerDto.Email,
 					Email = registerDto.Email,
 					FirstName = registerDto.FirstName,
 					LastName = registerDto.LastName,
-					// diğer özellikler...
+					
 				};
 
 				var result = await _userManager.CreateAsync(user, registerDto.Password);
@@ -199,9 +140,9 @@ namespace FinanceApp.Application.Services
 					var account = new Account
 					{
 						UserId = user.Id,
-						AccountNumber = GenerateAccountNumber(), // Hesap numarası üret
-						IBAN = GenerateIBAN(), // IBAN üret
-						BalanceAmount = 0, // Başlangıç bakiyesi
+						AccountNumber = GenerateAccountNumber(), 
+						IBAN = GenerateIBAN(),
+						BalanceAmount = 0, 
 						AccountOwner = $"{user.FirstName} {user.LastName}",
 						CreatedDate = DateTime.Now,
 						IsActive = true
@@ -210,7 +151,7 @@ namespace FinanceApp.Application.Services
 					_context.Accounts.Add(account);
 					await _context.SaveChangesAsync();
 
-					// Başarılı sonuç döndür
+		
 					return new AuthResultDto
 					{
 						Success = true,
@@ -220,7 +161,7 @@ namespace FinanceApp.Application.Services
 				}
 				else
 				{
-					// Kullanıcı oluşturulamadı
+			
 					var errors = string.Join(", ", result.Errors.Select(e => e.Description));
 					return new AuthResultDto
 					{
@@ -231,7 +172,7 @@ namespace FinanceApp.Application.Services
 			}
 			catch (Exception ex)
 			{
-				// Hata yönetimi
+			
 				return new AuthResultDto
 				{
 					Success = false,
@@ -252,22 +193,22 @@ namespace FinanceApp.Application.Services
 			return accountNumber;
 		}
 
-		// IBAN üretme fonksiyonu (basit örnek)
+	
 		private string GenerateIBAN()
 		{
 			var random = new Random();
 			var iban = "TR";
 
-			// 2 haneli kontrol kodu
+		
 			iban += random.Next(10, 99).ToString();
 
-			// 5 haneli banka kodu (örnek: 00001)
+		
 			iban += "00001";
 
-			// 1 haneli sıfır
+		
 			iban += "0";
 
-			// 16 haneli hesap numarası
+		
 			for (int i = 0; i < 16; i++)
 			{
 				iban += random.Next(0, 9).ToString();
@@ -287,12 +228,7 @@ namespace FinanceApp.Application.Services
 
 			return account.BalanceAmount;
 		}
-
-
-		public Task<AuthResultDto> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
-		{
-			throw new NotImplementedException();
-		}
+	
 		private async Task<string> GenerateJwtTokenAsync(AppUser user)
 		{
 			var jwtSettings = _configuration.GetSection("JwtSettings");
@@ -333,7 +269,7 @@ namespace FinanceApp.Application.Services
 				FullName = user.FullName,
 				CreatedAt = user.CreatedAt,
 				IsActive = user.IsActive
-				// henüz AccountNumber yok
+			
 			};
 
 			

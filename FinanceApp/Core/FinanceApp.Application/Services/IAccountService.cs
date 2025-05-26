@@ -10,8 +10,8 @@ namespace FinanceApp.Application.Services
 {
 	public interface IAccountService
 	{
-		Task<AccountDto> GetHesapByIdAsync(int id);
-		Task<AccountDto> GetHesapByAccountNumberAsync(string AccountNumber);
+		Task<AccountDto> GetAccountByIdAsync(int id);
+		Task<AccountDto> GetAccountByAccountNumberAsync(string AccountNumber);
 		Task<AccountDto> CreateAccountAsync(CreateAccountDto dto);
 		Task<decimal> GetBalanceAsync(string AccountNumber);
 		Task<IEnumerable<AccountDto>> GetAllAccountsAsync();

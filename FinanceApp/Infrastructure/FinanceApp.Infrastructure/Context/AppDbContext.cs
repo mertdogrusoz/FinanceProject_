@@ -20,14 +20,11 @@ namespace FinanceApp.Infrastructure.Context
 		public DbSet<Moneytransfer> Moneytransfers { get; set; }
 		public DbSet<LoanApplication> LoanApplications { get; set; }
 
-		// AppUsers DbSet'ini kaldırın - IdentityDbContext zaten Users sağlıyor
-
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
-			// Önce base.OnModelCreating'i çağırın
 			base.OnModelCreating(modelBuilder);
 
-			// AppUser yapılandırması
+		
 			modelBuilder.Entity<AppUser>(entity =>
 			{
 				entity.Property(e => e.FirstName).IsRequired().HasMaxLength(50);
@@ -35,7 +32,7 @@ namespace FinanceApp.Infrastructure.Context
 				entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
 			});
 
-			// Account yapılandırması
+			
 			modelBuilder.Entity<Account>(entity =>
 			{
 				entity.HasKey(e => e.Id);
@@ -51,7 +48,7 @@ namespace FinanceApp.Infrastructure.Context
 				   .OnDelete(DeleteBehavior.Cascade);
 			});
 
-			// MoneyTransfer yapılandırması
+			
 			modelBuilder.Entity<Moneytransfer>(entity =>
 			{
 				entity.HasKey(e => e.Id);
@@ -69,7 +66,7 @@ namespace FinanceApp.Infrastructure.Context
 					.OnDelete(DeleteBehavior.Restrict);
 			});
 
-			// LoanApplication yapılandırması
+		
 			modelBuilder.Entity<LoanApplication>(entity =>
 			{
 				entity.HasKey(e => e.Id);

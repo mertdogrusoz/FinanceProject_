@@ -22,11 +22,11 @@ namespace FinanceApp.API.Controllers
 
 
 		[HttpPost]
-		public async Task<ActionResult<TransferResultDto>> TransferYap(SendMoneyDto dto)
+		public async Task<ActionResult<TransferResultDto>> Transfer(SendMoneyDto dto)
 		{
 			try
 			{
-				var sonuc = await _service.TransferYapAsync(dto);
+				var sonuc = await _service.CreateTransferAsync(dto);
 				return Ok(sonuc);
 			}
 			catch (ValidationException ex)

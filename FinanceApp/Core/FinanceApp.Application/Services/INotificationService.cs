@@ -9,6 +9,6 @@ namespace FinanceApp.Application.Services
 {
 	public interface INotificationService
 	{
-		Task NotifyAsync(MoneyTransferedEvent @event);
+		Task SendAsync(string toEmail, string subject, string htmlBody);
 	}
 }

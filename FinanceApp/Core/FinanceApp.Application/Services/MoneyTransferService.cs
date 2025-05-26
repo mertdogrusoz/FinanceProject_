@@ -45,7 +45,7 @@ namespace FinanceApp.Application.Services
 			return $"TRF{DateTime.Now:yyyyMMddHHmmss}{new Random().Next(1000, 9999)}";
 		}
 
-		public async Task<TransferResultDto> TransferYapAsync(SendMoneyDto dto)
+		public async Task<TransferResultDto> CreateTransferAsync(SendMoneyDto dto)
 		{
 			var validationResult = await _validator.ValidateAsync(dto);
 			if (!validationResult.IsValid)
@@ -108,16 +108,16 @@ namespace FinanceApp.Application.Services
 			if (string.IsNullOrEmpty(accountNumber))
 				throw new ArgumentException("Account number cannot be null or empty", nameof(accountNumber));
 
-			// Hesabın var olup olmadığını kontrol et
+			
 			var account = await _unitOfWork.AccountRepository.GetByAccountNumberAsync(accountNumber);
 			if (account == null)
 				throw new AccountNotFoundException(accountNumber);
 
-			// Tarih aralığını kontrol et
+		
 			if (startDate.HasValue && endDate.HasValue && startDate > endDate)
 				throw new ArgumentException("Start date cannot be greater than end date");
 
-			// Eğer tarih belirtilmemişse, son 30 günü getir
+			
 			if (!startDate.HasValue && !endDate.HasValue)
 			{
 				startDate = DateTime.Now.AddDays(-30);
@@ -132,7 +132,7 @@ namespace FinanceApp.Application.Services
 				endDate = DateTime.Now;
 			}
 
-			// Repository'den veri çek ve DTO'ya çevir
+		
 			var transfers = await _unitOfWork.MoneyTransferRepository
 				.GetTransferHistoryAsync(account.Id, startDate.Value, endDate.Value);
 

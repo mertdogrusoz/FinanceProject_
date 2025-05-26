@@ -59,7 +59,7 @@ namespace FinanceApp.Application.Services
 			return account.BalanceAmount;
 		}
 
-		public async Task<AccountDto> GetHesapByAccountNumberAsync(string AccountNumber)
+		public async Task<AccountDto> GetAccountByAccountNumberAsync(string AccountNumber)
 		{
 			var account = await _unitOfWork.AccountRepository.GetByAccountNumberAsync(AccountNumber);
 			if (account == null)
@@ -68,7 +68,7 @@ namespace FinanceApp.Application.Services
 			return MapToDto(account);
 		}
 
-		public async Task<AccountDto> GetHesapByIdAsync(int id)
+		public async Task<AccountDto> GetAccountByIdAsync(int id)
 		{
 			var account = await _unitOfWork.AccountRepository.GetByIdAsync(id);
 			if (account == null)

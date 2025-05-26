@@ -76,59 +76,7 @@ namespace FinanceApp.API.Controllers
 				return StatusCode(500, new { message = "İç sunucu hatası", error = ex.Message });
 			}
 		}
-		[HttpPost("change-password")]
-		[Authorize]
-		public async Task<ActionResult<AuthResultDto>> ChangePassword(ChangePasswordDto changePasswordDto)
-		{
-			try
-			{
-				var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-				var result = await _authService.ChangePasswordAsync(userId, changePasswordDto);
-
-				if (result.Success)
-				{
-					return Ok(result);
-				}
-
-				return BadRequest(result);
-			}
-			catch (Exception ex)
-			{
-				return StatusCode(500, new { message = "İç sunucu hatası", error = ex.Message });
-			}
-		}
-		[HttpPost("forgot-password")]
-		public async Task<ActionResult> ForgotPassword(ForgotPasswordDto forgotPasswordDto)
-		{
-			try
-			{
-				await _authService.ForgotPasswordAsync(forgotPasswordDto);
-				return Ok(new { message = "Şifre sıfırlama bağlantısı email adresinize gönderildi" });
-			}
-			catch (Exception ex)
-			{
-				return StatusCode(500, new { message = "İç sunucu hatası", error = ex.Message });
-			}
-		}
-		[HttpPost("reset-password")]
-		public async Task<ActionResult<AuthResultDto>> ResetPassword(ResetPasswordDto resetPasswordDto)
-		{
-			try
-			{
-				var result = await _authService.ResetPasswordAsync(resetPasswordDto);
-
-				if (result.Success)
-				{
-					return Ok(result);
-				}
-
-				return BadRequest(result);
-			}
-			catch (Exception ex)
-			{
-				return StatusCode(500, new { message = "İç sunucu hatası", error = ex.Message });
-			}
-		}
+		
 		[HttpGet("profile")]
 		[Authorize]
 		public async Task<ActionResult<UserDto>> GetProfile()
@@ -140,76 +88,6 @@ namespace FinanceApp.API.Controllers
 
 			return Ok(userDto);
 		}
-
-
-
-		//[HttpGet]
-		//public async Task<ActionResult<IEnumerable<AccountDto>>> GetAllHesaplar()
-		//{
-		//	try
-		//	{
-		//		var hesaplar = await _accountService.GetAllAccountsAsync();
-		//		return Ok(hesaplar);
-		//	}
-		//	catch (Exception ex)
-		//	{
-		//		return StatusCode(500, new { message = "İç sunucu hatası", error = ex.Message });
-		//	}
-		//}
-
-		//[HttpGet("{id}")]
-		//public async Task<ActionResult<AccountDto>> GetHesap(int id)
-		//{
-		//	try
-		//	{
-		//		var hesap = await _accountService.GetHesapByIdAsync(id);
-		//		return Ok(hesap);
-		//	}
-		//	catch (AccountNotFoundException ex)
-		//	{
-		//		return NotFound(new { message = ex.Message });
-		//	}
-		//	catch (Exception ex)
-		//	{
-		//		return StatusCode(500, new { message = "İç sunucu hatası", error = ex.Message });
-		//	}
-		//}
-
-		//[HttpGet("hesap-no/{hesapNo}")]
-		//public async Task<ActionResult<AccountDto>> GetHesapByNumara(string hesapNo)
-		//{
-		//	try
-		//	{
-		//		var hesap = await _accountService.GetHesapByAccountNumberAsync(hesapNo);
-		//		return Ok(hesap);
-		//	}
-		//	catch (AccountNotFoundException ex)
-		//	{
-		//		return NotFound(new { message = ex.Message });
-		//	}
-		//	catch (Exception ex)
-		//	{
-		//		return StatusCode(500, new { message = "İç sunucu hatası", error = ex.Message });
-		//	}
-		//}
-
-		//[HttpPost]
-		//public async Task<ActionResult<AccountDto>> CreateHesap(CreateAccountDto dto)
-		//{
-		//	try
-		//	{
-		//		var hesap = await _accountService.CreateAccountAsync(dto);
-		//		return CreatedAtAction(nameof(GetHesap), new { id = hesap.Id }, hesap);
-		//	}
-		//	catch (ValidationException ex)
-		//	{
-		//		return BadRequest(new { message = "Validasyon hatası", errors = ex.Message });
-		//	}
-		//	catch (Exception ex)
-		//	{
-		//		return StatusCode(500, new { message = "İç sunucu hatası", error = ex.Message });
-		//	}
-		//}
 
 		[HttpGet("balance")]
 		[Authorize]

@@ -18,6 +18,6 @@ namespace FinanceApp.Application.DTOs
 		public string SenderAccountName { get; set; }
 		public string ReceiverAccountNumber { get; set; }
 		public string ReceiverAccountName { get; set; }
-		public string TransferType { get; set; } // "Giden" veya "Gelen"
+		public string TransferType { get; set; } 
 	}
 }
