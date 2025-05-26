@@ -20,6 +20,7 @@ namespace FinanceApp.API.Controllers
 		}
 
 
+
 		[HttpPost]
 		public async Task<ActionResult<TransferResultDto>> TransferYap(SendMoneyDto dto)
 		{
@@ -48,7 +49,7 @@ namespace FinanceApp.API.Controllers
 
 		[HttpGet("history/{accountNumber}")]
 		public async Task<ActionResult<IEnumerable<Moneytransfer>>> GetTransferHistory(
-		  string accountNumber,
+		  string accountNumber, // Route parametresi ile aynı isim
 		  [FromQuery] DateTime? started = null,
 		  [FromQuery] DateTime? finished = null)
 		{

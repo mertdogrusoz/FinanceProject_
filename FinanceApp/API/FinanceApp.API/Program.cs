@@ -3,6 +3,7 @@ using FinanceApp.Application.Services;
 using FinanceApp.Application.Validators;
 using FinanceApp.Domain.Entities;
 using FinanceApp.Domain.Interfaces;
+using FinanceApp.Infrastructure.Configuration;
 using FinanceApp.Infrastructure.Context;
 using FinanceApp.Infrastructure.Repositories;
 using FluentValidation;
@@ -97,6 +98,14 @@ builder.Services.AddScoped<IValidator<RegisterDto>, RegisterValidator>();
 builder.Services.AddScoped<IValidator<LoginDto>, LoginValidator>();
 builder.Services.AddScoped<IValidator<ChangePasswordDto>, ChangePasswordValidator>();
 
+builder.Services.AddScoped<INotificationService, GmailNotificationService>();
+
+builder.Services.Configure<GmailSettings>(
+	builder.Configuration.GetSection("Gmail"));
+builder.Services.Configure<NotificationSettings>(
+	builder.Configuration.GetSection("Notification"));
+
+
 builder.Services.AddCors(options =>
 {
 	options.AddPolicy("AllowReact",
@@ -136,6 +145,7 @@ builder.Services.AddSwaggerGen(options =>
 		}
 	});
 });
+
 
 var app = builder.Build();
 
